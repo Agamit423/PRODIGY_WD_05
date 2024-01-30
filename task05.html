@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        #weather-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        #error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather App</h1>
+
+    <div id="weather-container">
+        <label for="location">Enter location:</label>
+        <input type="text" id="location" placeholder="City, Country">
+        <button onclick="getWeather()">Get Weather</button>
+
+        <div id="error-message"></div>
+
+        <div id="weather-info">
+            <h2>Current Weather</h2>
+            <p id="temperature"></p>
+            <p id="conditions"></p>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = '11c1dd78ef0eda61fa1f0d3129ba9f9f';
+        const weatherInfo = document.getElementById('weather-info');
+        const errorMessage = document.getElementById('error-message');
+
+        function getWeather() {
+            const locationInput = document.getElementById('location');
+            const location = locationInput.value;
+
+            if (!location) {
+                errorMessage.textContent = 'Please enter a location.';
+                return;
+            }
+
+            errorMessage.textContent = '';
+
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cod === '404') {
+                        errorMessage.textContent = 'Location not found. Please try again.';
+                        return;
+                    }
+
+                    const temperature = data.main.temp;
+                    const conditions = data.weather[0].description;
+
+                    weatherInfo.innerHTML = `
+                        <h2>Current Weather</h2>
+                        <p>Temperature: ${temperature}°C</p>
+                        <p>Conditions: ${conditions}</p>
+                    `;
+                })
+                .catch(error => {
+                    errorMessage.textContent = 'An error occurred. Please try again later.';
+                    console.error('Error fetching weather data:', error);
+                });
+        }
+    </script>
+</body>
+</html>
